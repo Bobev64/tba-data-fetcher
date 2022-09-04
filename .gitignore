@@ -1,0 +1,4 @@
+# Where the api key you'd like to use is stored
+key.txt
+
+*.csv
