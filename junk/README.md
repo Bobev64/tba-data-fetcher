@@ -1,0 +1,1 @@
+# This folder contains various snippets of code that may be useful later

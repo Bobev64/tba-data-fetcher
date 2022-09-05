@@ -2,3 +2,7 @@
 key.txt
 
 *.csv
+*.json
+__pycache__/
+data/
+*.json
