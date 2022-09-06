@@ -36,25 +36,43 @@ class Sandstone():
     """
     Gets teams at competition. Name of json file reflects the function name. This will be a standard for all functions.
     """ 
-    def teams_at_comp(self, event_key: str):
+    def get_teams_at_comp(self, event_key: str):
         req = requests.get(f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams/simple", headers={"X-TBA-Auth-Key": self.tba_key})
         path = f"data/{self.year}/events/{event_key}/"
         self.save_data(req.text, path, "teams_at_comp")
-        return path + "teams_at_comp.json" 
 
     """
     Probably re-inventing the wheel here, but I'm going to keep it around for now anyways. 
-    Function loads json file from given event and data type (ex. "teams_at_comp")
+    Function returns path of json file with specified data type (ex. "teams_at_comp")
     """
-    def get_path(self, event_key: str, data_type: str):
+    def get_path_event(self, event_key: str, data_type: str):
         return f"data/{self.year}/events/{event_key}/{data_type}.json"
-
     
+    def get_path_team(self, team_key: str, data_type: str):
+        return f"data/{self.year}/teams/{team_key}/{data_type}.json"
 
-
+    def get_team_info(self, team_key: str):
+        req = requests.get(f"https://thebluealliance.com/api/v3/team/{team_key}/events/{self.year}/statuses", headers={"X-TBA-Auth-Key": self.tba_key}) 
+        self.save_data(req.text, f"data/{self.year}/teams/{team_key}/", "team_info")
+    
+    def get_team_awards(self, team_key: str):
+        req = requests.get(f"https://thebluealliance.com/api/v3/team/{team_key}/awards/{self.year}", headers={"X-TBA-Auth-Key": self.tba_key}) 
+        self.save_data(req.text, f"data/{self.year}/teams/{team_key}/", "team_awards")
+    
+    def team_list(self, event_key: str):
+        team_keys = []
+        teams = self.load_data(self.get_path_event(event_key, "teams_at_comp"))
+        for team in teams:
+            team_key = self.get_team_info(team["key"])
+            if team_key is not None:
+                team_keys.append(team_key)
+        return team_keys
+    
 if __name__ == "__main__":
     sandstone = Sandstone()
-    loaded_json = sandstone.load_data(sandstone.get_path("2022mibb", "teams_at_comp"))
+    loaded_json = sandstone.load_data(sandstone.get_path_event("2022mibb", "teams_at_comp"))
+    list_of_teams = sandstone.team_list("2022mibb")
 
-    
+    for team in list_of_teams:
+        sandstone.get_team_info(team)
 
