@@ -2,7 +2,11 @@ import requests
 import json
 import pathlib
 from pprint import pprint
+import time
 
+"""
+Sandstone is a class that provides numerous functions for extracting data from The Blue Alliance's API.
+"""
 
 class Sandstone():
     def __init__(self):
@@ -62,17 +66,19 @@ class Sandstone():
     def team_list(self, event_key: str):
         team_keys = []
         teams = self.load_data(self.get_path_event(event_key, "teams_at_comp"))
+
         for team in teams:
-            team_key = self.get_team_info(team["key"])
-            if team_key is not None:
-                team_keys.append(team_key)
+            if team["key"] is not None:
+                print("appending" + team["key"])
+                team_keys.append(team["key"])
+
         return team_keys
     
 if __name__ == "__main__":
     sandstone = Sandstone()
     loaded_json = sandstone.load_data(sandstone.get_path_event("2022mibb", "teams_at_comp"))
     list_of_teams = sandstone.team_list("2022mibb")
-
     for team in list_of_teams:
-        sandstone.get_team_info(team)
+        print(team)
+        sandstone.get_team_awards(team)
 
